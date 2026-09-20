@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Jetons de couleur du design system — source de vérité.
+ *
+ * Écrits en composantes RVB séparées par des espaces (et non en `#rrggbb`)
+ * pour que Tailwind puisse y appliquer une opacité : `bg-primary/10` devient
+ * `rgb(79 70 229 / 0.1)`. Avec une valeur hexadécimale, toutes les variantes
+ * `/10`, `/20`… seraient inertes.
+ *
+ * Un écran n'écrit jamais `dark:` pour une couleur : il utilise le jeton
+ * sémantique (`bg-surface`, `text-muted`) et c'est ce fichier qui le résout
+ * selon le thème. C'est ce qui permet de rethémer une application entière ici.
+ *
+ * ⚠️ Les jetons de marque et d'état sont volontairement identiques à ceux du
+ * template mobile (`mobile-template/global.css`) : une même identité sur les
+ * deux plateformes, et un thème client à reporter en un seul copier-coller.
+ */
+@layer base {
+  :root {
+    /* Fonds */
+    --color-background: 249 250 251;
+    --color-surface: 255 255 255;
+    --color-surface-raised: 243 244 246;
+    --color-overlay: 17 24 39;
+
+    /* Textes */
+    --color-foreground: 17 24 39;
+    --color-muted: 107 114 128;
+    --color-subtle: 156 163 175;
+
+    /* Traits */
+    --color-border: 229 231 235;
+    --color-ring: 79 70 229;
+
+    /* Marque */
+    --color-primary: 79 70 229;
+    --color-primary-hover: 67 56 202;
+    --color-primary-foreground: 255 255 255;
+    --color-primary-soft: 238 242 255;
+
+    /* États */
+    --color-success: 5 150 105;
+    --color-success-soft: 236 253 245;
+    --color-warning: 180 83 9;
+    --color-warning-soft: 255 251 235;
+    --color-danger: 220 38 38;
+    --color-danger-hover: 185 28 28;
+    --color-danger-soft: 254 242 242;
+    --color-info: 37 99 235;
+    --color-info-soft: 239 246 255;
+
+    /**
+     * Séries de graphiques.
+     *
+     * Palette distincte des jetons de marque, et ce n'est pas un oubli : une
+     * série n'est pas un état. Si `chart-1` valait `primary`, changer la
+     * couleur du client repeindrait les courbes, et deux séries voisines
+     * finiraient à la même teinte.
+     *
+     * L'ordre des huit teintes est la mécanique d'accessibilité, pas une
+     * décoration : il est choisi pour que deux séries adjacentes restent
+     * distinguables en vision déficiente (ΔE ≥ 8 en OKLab). Réordonner, c'est
+     * casser la garantie. Au-delà de trois séries sur un nuage de points,
+     * regrouper en « Autres » plutôt que d'en ajouter une neuvième.
+     *
+     * ⚠️ Les mêmes valeurs sont dupliquées en hexadécimal dans
+     * `src/components/charts/chart-theme.ts` : Recharts écrit les couleurs en
+     * attributs SVG, qui ne résolvent pas `var()`. Les deux doivent rester
+     * synchronisés.
+     */
+    --color-chart-1: 42 120 214;
+    --color-chart-2: 235 104 52;
+    --color-chart-3: 27 175 122;
+    --color-chart-4: 237 161 0;
+    --color-chart-5: 232 123 164;
+    --color-chart-6: 0 131 0;
+    --color-chart-7: 74 58 167;
+    --color-chart-8: 227 73 72;
+  }
+
+  /**
+   * Thème sombre.
+   *
+   * `.dark` posée sur `<html>` et non une media query : `darkMode: 'class'`
+   * laisse la main à `ThemeProvider`, qui suit le système par défaut mais
+   * accepte un choix explicite de l'utilisateur.
+   *
+   * Les rôles sont inversés, pas les couleurs : `surface` reste « la carte au
+   * premier plan », simplement plus claire que le fond au lieu d'être plus
+   * blanche.
+   */
+  .dark {
+    --color-background: 9 13 24;
+    --color-surface: 17 24 39;
+    --color-surface-raised: 31 41 55;
+    --color-overlay: 0 0 0;
+
+    --color-foreground: 249 250 251;
+    --color-muted: 156 163 175;
+    --color-subtle: 107 114 128;
+
+    --color-border: 39 48 66;
+    --color-ring: 129 140 248;
+
+    --color-primary: 99 102 241;
+    --color-primary-hover: 129 140 248;
+    --color-primary-foreground: 255 255 255;
+    /* Les teintes « soft » deviennent sombres : un fond pastel sur du sombre
+       éblouit et casse le contraste du texte posé dessus. */
+    --color-primary-soft: 30 27 75;
+
+    --color-success: 52 211 153;
+    --color-success-soft: 6 43 34;
+    --color-warning: 251 191 36;
+    --color-warning-soft: 51 32 5;
+    --color-danger: 248 113 113;
+    --color-danger-hover: 252 165 165;
+    --color-danger-soft: 60 15 15;
+    --color-info: 96 165 250;
+    --color-info-soft: 14 30 62;
+
+    /* Les mêmes huit teintes, re-échelonnées pour le fond sombre — pas une
+       autre palette, et surtout pas l'inverse automatique des claires. */
+    --color-chart-1: 57 135 229;
+    --color-chart-2: 217 89 38;
+    --color-chart-3: 25 158 112;
+    --color-chart-4: 201 133 0;
+    --color-chart-5: 213 81 129;
+    --color-chart-6: 0 131 0;
+    --color-chart-7: 144 133 233;
+    --color-chart-8: 230 103 103;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply antialiased;
+    /* Indique au navigateur de thémer ses propres surfaces (ascenseurs,
+       champs natifs, autofill) — sinon elles restent claires en mode sombre. */
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+
+  /**
+   * Anneau de focus global.
+   *
+   * `:focus-visible` et non `:focus` : le second dessine l'anneau après un
+   * simple clic souris, ce que tout le monde prend pour un bug d'affichage.
+   * Le supprimer entièrement rendrait l'application inutilisable au clavier.
+   */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Ascenseurs discrets — ils suivent le thème au lieu de trancher dessus. */
+  ::-webkit-scrollbar {
+    @apply h-2 w-2;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-subtle;
+  }
+}
+
+@layer components {
+  /**
+   * Masque les éléments à l'écran sans les retirer de l'arbre d'accessibilité.
+   * `display: none` les rendrait muets pour un lecteur d'écran.
+   */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    @apply sr-only;
+  }
+}
+
+/**
+ * Respecte le réglage système « réduire les animations ».
+ * Un vestibulaire fragile ne devrait pas avoir la nausée sur un back-office.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

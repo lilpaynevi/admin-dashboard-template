@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Administration</title>
+
+    <!--
+      Le thème est appliqué avant le premier rendu.
+
+      Sans ce script, la page s'affiche en clair pendant quelques images puis
+      bascule en sombre quand React monte : un flash blanc en pleine nuit.
+      Le script est volontairement inline et synchrone — un fichier externe
+      arriverait trop tard.
+
+      La clé doit rester identique à `THEME_STORAGE_KEY` (src/providers/ThemeProvider.tsx).
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('ui-theme');
+          var system = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+          var resolved = stored === 'light' || stored === 'dark' ? stored : system;
+          document.documentElement.classList.toggle('dark', resolved === 'dark');
+          document.documentElement.style.colorScheme = resolved;
+        } catch (error) {
+          /* Navigation privée : le stockage jette. On garde le thème clair. */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
